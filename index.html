@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>멤버놀이 성향 테스트</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#313338; --panel:#2b2d31; --deep:#1e1f22; --ink:#f2f3f5; --sub:#b5bac1; --line:#3f4147;
+  --accent:#5865f2; --accent-hover:#4752c4; --green:#23a559; --bar:#404249; color-scheme:dark;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;line-height:1.6;min-height:100vh}
+main{max-width:520px;margin:0 auto;padding:20px 16px 56px}
+h1,h2,h3{font-weight:700;margin:0;line-height:1.3}
+.hidden{display:none!important}
+.btn{display:block;width:100%;border:0;border-radius:8px;padding:13px 16px;font:inherit;font-weight:600;font-size:15px;cursor:pointer;background:var(--accent);color:#fff;transition:background .15s}
+.btn:hover{background:var(--accent-hover)}
+.btn.ghost{background:var(--bar);color:var(--ink);margin-top:10px}
+.btn.ghost:hover{background:#4e5058}
+.top .btn{width:auto;margin:0;padding:7px 12px;font-size:14px;white-space:nowrap}
+.btn:focus-visible,.opt:focus-visible{outline:3px solid #00a8fc;outline-offset:2px}
+.top-bar{display:flex;align-items:center;gap:10px;background:var(--deep);padding:12px 14px;border-radius:8px;margin-bottom:18px;font-weight:700;font-size:15px}
+.top-bar i{width:10px;height:10px;border-radius:50%;background:var(--green)}
+.intro{padding-top:6vh}
+.intro h1{font-size:clamp(34px,10vw,46px);letter-spacing:-.01em}
+.intro p{color:var(--sub);margin:14px 0 28px}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.track{flex:1;height:8px;border-radius:99px;background:var(--bar);overflow:hidden}
+.fill{height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .25s}
+.count{font-size:14px;color:var(--sub);min-width:40px;text-align:right}
+.chat-head{display:flex;align-items:center;gap:8px;background:var(--deep);border-radius:8px 8px 0 0;padding:10px 14px;font-weight:700}
+.hash{color:var(--sub);font-size:20px;line-height:1}
+.feed{background:var(--panel);border-radius:0 0 8px 8px;padding:18px 14px;margin-bottom:14px;min-height:96px}
+.msg{display:flex;gap:12px;align-items:flex-start}
+.av{flex:none;width:40px;height:40px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;font-weight:700;font-size:16px}
+.msg .body{min-width:0}
+.msg .nm{font-weight:600;font-size:15px;color:var(--c)}
+.msg .nm small{color:var(--sub);font-weight:400;margin-left:8px;font-size:12px}
+.msg .tx{margin-top:2px;line-height:1.55;word-break:keep-all;font-size:16px}
+.dots{display:inline-flex;gap:4px;padding:6px 0}
+.dots i{width:8px;height:8px;border-radius:50%;background:var(--sub);animation:blink 1s infinite}
+.dots i:nth-child(2){animation-delay:.2s}.dots i:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,60%,100%{opacity:.25}30%{opacity:1}}
+.opts{display:grid;gap:8px}
+.opt{text-align:left;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:13px 14px;font:inherit;font-size:15px;cursor:pointer;transition:background .12s,border-color .12s}
+.opt:hover{background:#35373c;border-color:var(--accent)}
+.opt:active{background:#3b3d44}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:26px 20px 22px;position:relative;overflow:hidden;text-align:center}
+.card::before{content:"";position:absolute;inset:0 0 auto 0;height:6px;background:var(--tc,var(--accent))}
+.spr{display:block;width:150px;height:105px;image-rendering:pixelated;margin:6px auto 8px}
+.pos{display:inline-block;font-size:13px;font-weight:600;border:1.5px solid var(--tc,var(--accent));color:var(--ink);border-radius:99px;padding:2px 12px;margin:4px 0 12px}
+.card h2{font-size:28px}
+.desc{margin:12px 0 0;font-size:15.5px}
+.meta{margin-top:20px;padding-top:18px;border-top:1px solid var(--line);display:grid;gap:12px;font-size:14.5px}
+.meta b{display:block;font-size:12.5px;color:var(--sub);font-weight:600}
+.bars{margin:22px 0 20px;display:grid;gap:10px}
+.bars h3{font-size:17px;margin-bottom:2px}
+.gauge .name{font-size:14px;font-weight:600;margin-bottom:8px}
+.gauge .rail{position:relative;height:8px;border-radius:99px;background:var(--bar)}
+.gauge .rail::after{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:2px;background:var(--line)}
+.gauge .dot{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--tc,var(--accent));border:3px solid var(--panel);transform:translate(-50%,-50%)}
+.gauge .lab{display:flex;justify-content:space-between;font-size:12.5px;color:var(--sub);margin-top:6px}
+.shot img{display:block;width:100%;height:auto;border-radius:12px;margin-top:14px;border:1px solid var(--line)}
+.shot p{font-size:13.5px;color:var(--sub);margin:8px 0 10px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.dots i{animation:none}}
+</style>
+</head>
+<body>
+<main>
+  <div class="top-bar"><i></i>멤버놀이 · 성향 테스트</div>
+  <section id="intro" class="intro">
+    <h1>멤버놀이<br>성향 테스트</h1>
+    <p>일반형, 지존형, 명찰형, 반전형, 음침형, 무성향까지. 온라인에서 보이는 나와 마음속 두 가지를 따로 재서 내 성향을 알려줘요. 지인 1과 연락 상대가 보내는 메시지에 답장하면 돼요! (24문항)</p>
+    <button class="btn" id="start">테스트 시작</button>
+  </section>
+
+  <section id="quiz" class="hidden" aria-live="polite">
+    <div class="top">
+      <button class="btn ghost hidden" id="back" type="button">← 이전</button>
+      <div class="track"><div class="fill" id="fill"></div></div>
+      <div class="count" id="count">1/24</div>
+    </div>
+    <div class="chat-head"><span class="hash">#</span><b id="chan">구함글-밴드</b></div>
+    <div class="feed" id="feed"></div>
+    <div class="opts" id="opts"></div>
+  </section>
+
+  <section id="result" class="hidden">
+    <div class="card" id="card"></div>
+    <div class="bars" id="bars"></div>
+    <button class="btn" id="mkimg">결과 이미지 만들기</button>
+    <div class="shot hidden" id="shot">
+      <img id="shotimg" alt="내 멤버놀이 성향 결과 이미지">
+      <p>이미지를 길게 눌러서 저장해도 돼요. (PC는 우클릭)</p>
+      <button class="btn hidden" id="saveimg" type="button">이미지 파일로 저장</button>
+    </div>
+    <button class="btn ghost" id="again">다시 하기</button>
+    <button class="btn ghost" id="copy">결과 텍스트 복사</button>
+  </section>
+</main>
+
+<script>
+(function(){
+  var TYPES = {
+    TOP:{name:"일반형 (탑/부치)",emoji:"🛡️",color:"#2f8fd8",pos:"리더 · 센터",
+      desc:"겉이든 속이든 리드하는 쪽이 편한 타입임. 계획 짜고 먼저 다가가고 챙기는 데서 보람 느낌. 말투도 분위기도 든든하고 담백한 편임.",
+      good:"연인을 이끌고 이벤트 준비할 때 제일 빛남",
+      care:"혼자 다 책임지려다 지칠 수 있음. 챙김을 받는 것도 연습이 필요함",
+      match:"팸/바텀 (같은 그룹 임관이라 접점 있으면 더 잘 풀림)"},
+    BOT:{name:"일반형 (팸/바텀)",emoji:"🌸",color:"#f0607a",pos:"막내 · 비주얼",
+      desc:"겉이든 속이든 맞춰 가는 쪽이 편한 타입임. 애정 표현이 풍부하고 챙김을 받을 때 안정감을 느낌. 말투도 분위기도 부드럽고 리액션이 큰 편임.",
+      good:"연인이랑 다정한 일상 대화 나눌 때 제일 빛남",
+      care:"원하는 걸 말 안 하고 기다리다 서운해질 수 있음",
+      match:"탑/부치 (같은 그룹 임관이라 접점 있으면 더 잘 풀림)"},
+    MID:{name:"무성향",emoji:"🌗",color:"#8a6cf0",pos:"올라운더 · 서브",
+      desc:"어느 쪽이든 편한 타입임. 상대랑 상황에 따라 리드할 때도 맞출 때도 있어서 어디서든 잘 어울림. 겉이랑 속이 크게 어긋나지도 않음.",
+      good:"상대 성향에 맞춰 역할 바꿔 가며 놀 때",
+      care:"내가 원하는 게 뭔지 헷갈릴 수 있음",
+      match:"누구랑도 괜찮음. 근데 같은 무성향이면 역할 정하기 제일 어려움ㅋㅋ"},
+    MIDTOP:{name:"무성향 (탑 쪽)",emoji:"🌓",color:"#3f8fb8",pos:"올라운더 · 센터 쪽",
+      desc:"다 괜찮은데 굳이 고르자면 리드하는 쪽에 조금 더 가까움. 상대가 이끌어 주면 맞추고, 상대가 조용하면 자연스럽게 앞장섬.",
+      good:"상대 성향 따라 역할 바꾸면서 놀 때",
+      care:"둘 다 괜찮다 보니 정작 내가 원하는 걸 말 못 할 수 있음",
+      match:"팸/바텀 또는 같은 무성향"},
+    MIDBOT:{name:"무성향 (팸 쪽)",emoji:"🌖",color:"#c870b0",pos:"올라운더 · 서브 쪽",
+      desc:"다 괜찮은데 굳이 고르자면 맞춰 가는 쪽에 조금 더 가까움. 상대가 리드해 주면 편하고, 상대가 망설이면 내가 한 발 먼저 나서기도 함.",
+      good:"분위기 읽으면서 상대가 편한 쪽으로 맞춰 갈 때",
+      care:"눈치 보다가 내 마음을 뒤로 미룰 수 있음",
+      match:"탑/부치 또는 같은 무성향"},
+    STRONGTOP:{name:"지존형 (탑/부치)",emoji:"🏔️",color:"#1f5fa8",pos:"리더 · 센터 중의 센터",
+      desc:"겉도 속도 흔들림 없는 리드형임. 구함글에 먼저 리댓 달고 계획이랑 결정은 내가 한다는 확신이 있음. 상대가 기댈 수 있는 큰 산 같은 존재임. 재미로 보는 결과임!",
+      good:"관계 방향 잡고 끝까지 이끌 때",
+      care:"혼자 다 짊어질 수 있음. 가끔은 상대한테 기대는 것도 필요함",
+      match:"지존형 팸/바텀 (같은 그룹 임관이라 접점 있으면 더 잘 풀림)"},
+    BORNBOT:{name:"지존형 (팸/바텀)",emoji:"☁️",color:"#d0709c",pos:"막내 · 사랑받는 담당",
+      desc:"타고난 맞춤형임. 챙김을 받고 사랑받는 게 제일 자연스럽고, 상대가 이끌어 줄 때 제일 편함. 리액션이랑 애정 표현이 풍부해서 곁에 있으면 분위기가 부드러워짐. 재미로 보는 결과임!",
+      good:"상대가 이끌어 주는 관계에서 마음껏 애정 표현할 때",
+      care:"원하는 걸 말 안 하고 기다리다 서운해질 수 있음",
+      match:"지존형 탑/부치 (같은 그룹 임관이라 접점 있으면 더 잘 풀림)"},
+    MENTOP:{name:"음침형 (탑/부치)",emoji:"🔒",color:"#c2402f",pos:"리더 · 집착 담당",
+      desc:"겉으론 든든한 리더인데 연락 끊기면 하루 종일 폰만 보는 타입임. 챙기는 마음이 넘쳐서 상대가 가끔 숨 막힐 수도 있지만 그만큼 진심이 큼. 재미로 보는 결과임!",
+      good:"애정이 필요한 상대를 끝까지 챙길 때",
+      care:"읽씹 하나에 혼자 시나리오 쓸 수 있음. 연락 텀을 서로 약속해 두면 편함",
+      match:"연락 꾸준한 팸/바텀"},
+    MENBOT:{name:"음침형 (팸/바텀)",emoji:"🥺",color:"#b0488a",pos:"막내 · 애정 과다 담당",
+      desc:"사랑받고 싶은 마음이 커서 답장 늦어지면 불안해지는 타입임. 서운함을 크게 표현하고 상대가 안심시켜 주길 바람. 애정 표현이 많아서 귀엽지만 연락 텀엔 예민함. 재미로 보는 결과임!",
+      good:"애정 표현을 아낌없이 주고받을 때",
+      care:"혼자 최악의 상상을 할 수 있음. 불안하다고 솔직히 말하면 훨씬 편함",
+      match:"연락 꾸준히 해 주는 탑/부치"},
+    FAKETOP:{name:"명찰형",emoji:"🎭",color:"#d9822b",pos:"탑/부치인 척하는 팸/바텀",
+      desc:"밖에서는 탑/부치처럼 보이는데 속마음은 팸/바텀에 가까운 타입임. 주변엔 든든한 이미지인데 가까운 사람 앞에선 챙김을 받고 싶은 마음이 크게 올라옴.",
+      good:"평소엔 믿음직하게, 둘만 있을 땐 마음껏 기대고 싶을 때",
+      care:"이미지 때문에 속마음 숨기고 혼자 버틸 수 있음",
+      match:"겉모습 뒤의 마음까지 읽어 주는 탑/부치"},
+    FAKEBOT:{name:"반전형",emoji:"🐑",color:"#1fa37a",pos:"겉은 팸/바텀 · 속은 탑",
+      desc:"겉으론 부드럽고 팸/바텀처럼 보이는데 속마음은 리드하는 쪽에 가까운 타입임. 평소엔 순한 이미지인데 중요한 순간엔 결정하고 챙기는 사람임.",
+      good:"예상 밖의 든든함으로 연인을 놀라게 할 때",
+      care:"겉모습만 보고 맞춰 주려는 상대랑 역할이 엇갈릴 수 있음",
+      match:"속마음의 리드를 반겨 주는 팸/바텀"}
+  };
+  var Q = [
+    {a:"o",q:"구함글에서 마음에 드는 글을 발견했어요.",s:"온라인에서의 나",
+     o:[[1,"내가 먼저 리댓 달래"],[0,"좀 고민해 보고 분위기 봐서 달래"],[-1,"내 글에 리댓 달리길 기다릴래"]]},
+    {a:"o",q:"구함글에 내 임관과 접점이 없는 사람이 올라왔어요.",s:"온라인에서의 나",
+     o:[[1,"접점 없어도 마음에 들면 내가 먼저 물어볼래"],[0,"고민하다가 한번 물어볼래"],[-1,"접점 있는 사람만 찾아볼래"]]},
+    {a:"f",q:"내 구함 댓글에 원하는 상대 성향을 쓴다면?",s:"온라인에서의 나",
+     o:[[2,"같은 성향도 괜찮다고 적을래"],[1,"끌리면 같은 성향도 생각해 본다고 적을래"],[0,"같은 성향은 절대 안 만난다고 적을래"]]},
+    {a:"f",q:"마음에 드는 구함 댓글인데 나와 같은 성향이에요.",s:"온라인에서의 나",
+     o:[[2,"내 성향 바꿔서 리댓 달래"],[1,"같은 성향인데 괜찮냐고 물어보는 리댓 달래"],[0,"아쉽지만 그냥 넘어갈래"]]},
+    {a:"o",q:"단체 밴드에서 대화가 이어지고 있어요.",s:"온라인에서의 나",
+     o:[[1,"내가 주제 던져서 이끌래"],[0,"편한 만큼만 자연스럽게 낄래"],[-1,"리액션 위주로 맞춰 갈래"]]},
+    {a:"o",q:"단체 밴드에서 관심 가는 사람이 생겼어요.",s:"온라인에서의 나",
+     o:[[1,"내가 먼저 개인 밴드 보낼래"],[0,"분위기 보다가 보낼지 정할래"],[-1,"상대가 개인 밴드 보내 주길 기다릴래"]]},
+    {a:"o",q:"그룹콜 밴드에서 통화가 시작됐어요.",s:"온라인에서의 나",
+     o:[[1,"내가 진행 맡거나 분위기 정리할래"],[0,"그때 분위기 봐서 달라질 듯"],[-1,"주로 듣고 웃고 호응할래"]]},
+    {a:"o",q:"지인이 소개해준 사람과 첫 대화를 해요.",s:"온라인에서의 나",
+     o:[[1,"내가 먼저 질문 던지면서 이끌래"],[0,"자연스럽게 주고받을래"],[-1,"상대가 말 걸어 주길 기다릴래"]]},
+    {a:"o",q:"성향을 적지 않는 그룹콜 밴드에서 마음에 드는 사람을 만났어요.",s:"온라인에서의 나",
+     o:[[1,"내가 먼저 성향 물어볼래"],[0,"대화하다 보면 자연스럽게 알겠지"],[-1,"상대가 먼저 말해 주길 기다릴래"]]},
+    {a:"o",q:"처음 대화할 때 내 말투는?",s:"온라인에서의 나",
+     o:[[1,"짧고 담백하게, 차분한 느낌"],[0,"상대 따라 바뀜"],[-1,"부드럽게, 이모티콘이랑 리액션 많이 씀"]]},
+    {a:"o",q:"서로 좋아하는 임관 이야기로 대화하게 됐어요.",s:"온라인에서의 나",
+     o:[[1,"내가 먼저 화제 꺼내서 이끌래"],[0,"서로 번갈아 가며 얘기할래"],[-1,"상대 얘기에 맞장구치면서 들을래"]]},
+
+    {a:"i",q:"사이버 연애를 하다 첫 데이트를 잡을 때 나는?",s:"속마음",
+     o:[[1,"장소랑 일정 내가 짜는 게 편해"],[0,"같이 정하는 게 제일 좋음"],[-1,"상대가 정해 줬으면 좋겠음"]]},
+    {a:"i",q:"상대가 힘들다고 연락이 왔을 때 나는?",s:"속마음",
+     o:[[1,"무슨 일이야? 바로 전화할게"],[0,"무슨 일 있어? 서로 얘기해 보자"],[-1,"나도 오늘 힘들었어... 위로해 줘"]]},
+    {a:"i",q:"싸운 뒤에 화해하는 순간, 나는?",s:"속마음",
+     o:[[1,"내가 먼저 다가갈래"],[0,"그때그때 먼저 하는 쪽이 다름"],[-1,"상대가 먼저 다가와 줬으면 해"]]},
+    {a:"i",q:"썸이 무르익어서 고백할 타이밍이 왔어요.",s:"속마음",
+     o:[[1,"내가 먼저 고백할래"],[0,"분위기 보다가 먼저 말하는 쪽이 정해질 듯"],[-1,"상대가 고백해 주길 기다릴래"]]},
+    {a:"i",q:"상대가 다른 사람과 친하게 대화하는 걸 봤어요.",s:"속마음",
+     o:[[1,"티 안 내고 내가 먼저 말 걸어서 풀래"],[0,"신경은 쓰이지만 일단 지켜볼래"],[-1,"서운하다고 말하고 알아채 주길 바랄래"]]},
+    {a:"i",q:"상대가 갑자기 \"보고 싶다\"고 말했어요.",s:"속마음",
+     o:[[1,"나도! 바로 통화하거나 약속 잡자"],[0,"나도 같은 마음이야. 같이 방법 찾아보자"],[-1,"헐... 설레서 말이 안 나와. 네가 이끌어 줘"]]},
+    {a:"i",q:"하루를 시작하는 연락은 보통 누가 하면 좋아요?",s:"속마음",
+     o:[[1,"내가 먼저 아침 인사 하고 싶어"],[0,"그때그때 먼저 하는 쪽이 다른 게 좋음"],[-1,"상대가 먼저 해 주면 좋겠음"]]},
+    {a:"i",q:"통화하고 싶은 마음이 들었어요.",s:"속마음",
+     o:[[1,"내가 먼저 전화 걸어서 말할래"],[0,"서로 편한 시간 맞출래"],[-1,"상대가 전화해 주길 기다릴래"]]},
+    {a:"i",q:"약속 장소를 상대가 못 정하고 있어요.",s:"속마음",
+     o:[[1,"내가 대신 정해 줄래"],[0,"같이 고민해서 정할래"],[-1,"나도 못 정해서 상대가 정해 주길 기다릴래"]]},
+    {a:"i",q:"사귀게 됐는데 서로 임관 접점이 없어요. 커플링은?",s:"속마음",
+     o:[[1,"내가 먼저 같은 그룹으로 바꿔서 맞추자고 할래"],[0,"같이 상의해서 어떻게 할지 정할래"],[-1,"상대가 맞추자고 말해 주길 기다릴래"]]},
+    {a:"f",q:"상대가 같은 그룹으로 임관을 바꿔서 맞춰 달라고 해요.",s:"속마음",
+     o:[[2,"프로필만 바꾸면 되니까 기꺼이 바꿀게"],[1,"상황 보고 바꿔도 될지 정할게"],[0,"내 임관은 그대로 두고 싶어"]]},
+
+    {a:"c",q:"상대가 내 연락을 읽었는데 한 시간째 답이 없어요.",s:"연락 습관",
+     o:[[2,"폰만 보다가 결국 다시 연락할래"],[1,"신경 쓰이지만 기다려 볼래"],[0,"바쁜가 보다 하고 내 할 일 할래"]]},
+    {a:"c",q:"상대가 밴드에서 다른 사람과만 대화하고 내게는 답이 없어요.",s:"연락 습관",
+     o:[[2,"서운해서 바로 따로 밴드 보낼래"],[1,"서운하지만 티는 안 내고 넘길래"],[0,"별생각 없이 넘길래"]]}
+  ];
+  var MAXO=Q.filter(function(x){return x.a==="o"}).length;
+  var MAXI=Q.filter(function(x){return x.a==="i"}).length;
+
+  var $ = function(id){return document.getElementById(id)};
+  var outer, inner, clingy, flex, idx;
+
+  function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+  function show(id){["intro","quiz","result"].forEach(function(s){$(s).classList.toggle("hidden",s!==id)});window.scrollTo(0,0)}
+  function start(){outer=0;inner=0;clingy=0;flex=0;idx=0;ans=[];$("feed").innerHTML="";show("quiz");render()}
+
+  var CHAN={"온라인에서의 나":"구함글-밴드","속마음":"개인-밴드","연락 습관":"연락-텀"};
+  var WHO={"지인 1":["지","#00a832"],"연락 상대":["연","#5865f2"],"나":["나","#d9822b"]};
+  var MSG=[
+    ["지인 1","야 이 구함글 봄? 마음에 드는 글 있는데 어떡할 거임?"],
+    ["지인 1","근데 이 사람 임관이 너랑 접점이 아예 없음. 그래도 신경 쓰이면 어떡함?"],
+    ["지인 1","구함 댓글 쓰는 중이지? 원하는 상대 성향은 뭐라고 적을 거임?"],
+    ["지인 1","아 마음에 드는 구함 댓글인데 너랑 같은 성향임. 어떡함?"],
+    ["지인 1","단체 밴드 대화 이어지는 중임. 너는 어떻게 함?"],
+    ["지인 1","단체 밴드에서 관심 가는 사람 생겼다며. 개인 밴드는 어떻게 할 거임?"],
+    ["지인 1","그룹콜 밴드에서 통화 시작함. 너는 어떤 편임?"],
+    ["지인 1","지인이 소개해 준 사람이랑 첫 대화 시작함. 어떻게 함?"],
+    ["지인 1","성향 안 적는 그룹콜 밴드에서 마음에 드는 사람 만났음. 성향은 어떻게 알아봄?"],
+    ["지인 1","처음 대화할 때 너 말투는 어떰?"],
+    ["지인 1","서로 좋아하는 임관 얘기로 대화하게 됐음. 너는 어떻게 함?"],
+    ["지인 1","사이버 연애하다가 첫 데이트 잡을 때 너는 어떻게 함?"],
+    ["연락 상대","오늘 좀 힘드네..."],
+    ["지인 1","싸운 뒤에 화해하는 순간이면 너는 어떻게 함?"],
+    ["지인 1","썸이 무르익어서 고백할 타이밍 왔음. 어떻게 함?"],
+    ["지인 1","상대가 다른 사람이랑 친하게 대화하는 거 봤음. 어때?"],
+    ["연락 상대","나 갑자기 너 보고 싶다..."],
+    ["지인 1","하루 시작하는 연락은 보통 누가 하면 좋음?"],
+    ["지인 1","통화하고 싶은 마음 들었음. 어떻게 함?"],
+    ["지인 1","약속 장소를 상대가 못 정하고 있음. 너는 어떻게 함?"],
+    ["지인 1","사귀게 됐는데 서로 임관 접점이 없음. 커플링은 어떻게 함?"],
+    ["연락 상대","나랑 같은 그룹으로 임관 바꿔 줄 수 있음?"],
+    ["지인 1","상대가 네 연락 읽었는데 한 시간째 답이 없음. 너는 어떻게 함?"],
+    ["지인 1","상대가 밴드에서 다른 사람이랑만 대화하고 너한테는 답이 없음. 너는 어떻게 함?"]
+  ];
+  var clock=21*60+7;
+  function tm(){
+    clock+=1+Math.floor(Math.random()*2);
+    var h=Math.floor(clock/60)%24,m=clock%60,ap=h>=12?"오후":"오전",hh=h%12===0?12:h%12;
+    return ap+" "+hh+":"+(m<10?"0"+m:m);
+  }
+  function addMsg(who,text){
+    var w=WHO[who],d=document.createElement("div");
+    d.className="msg"+(who==="나"?" me":"");
+    d.style.setProperty("--c",w[1]);
+    var av=document.createElement("div");av.className="av";av.textContent=w[0];
+    var body=document.createElement("div");body.className="body";
+    var nm=document.createElement("div");nm.className="nm";nm.textContent=who;
+    var sm=document.createElement("small");sm.textContent=tm();nm.appendChild(sm);
+    var tx=document.createElement("div");tx.className="tx";tx.textContent=text;
+    body.appendChild(nm);body.appendChild(tx);d.appendChild(av);d.appendChild(body);
+    $("feed").appendChild(d);
+    return d;
+  }
+  function addTyping(who){
+    var w=WHO[who],d=document.createElement("div");
+    d.className="msg";d.style.setProperty("--c",w[1]);
+    d.innerHTML='<div class="av">'+w[0]+'</div><div class="body"><div class="nm">'+who+'</div><div class="tx"><span class="dots" aria-label="입력 중"><i></i><i></i><i></i></span></div></div>';
+    $("feed").appendChild(d);
+    return d;
+  }
+
+  var ans=[];
+  function recompute(){
+    outer=0;inner=0;clingy=0;flex=0;
+    ans.forEach(function(a){
+      if(a[0]==="o")outer+=a[1];else if(a[0]==="i")inner+=a[1];else if(a[0]==="f")flex+=a[1];else clingy+=a[1];
+    });
+  }
+  function render(){
+    var item=Q[idx],m=MSG[idx];
+    $("chan").textContent=CHAN[item.s]||"멤놀";
+    $("count").textContent=(idx+1)+"/"+Q.length;
+    $("fill").style.width=(idx/Q.length*100)+"%";
+    $("back").classList.toggle("hidden",idx===0);
+    $("feed").innerHTML="";
+    clock=21*60+7+idx*2;
+    addMsg(m[0],m[1]);
+    var box=$("opts");box.innerHTML="";
+    shuffle(item.o).forEach(function(o){
+      var b=document.createElement("button");
+      b.className="opt";b.type="button";b.textContent=o[1];
+      b.addEventListener("click",function(){pick(item.a,o[0])});
+      box.appendChild(b);
+    });
+    window.scrollTo(0,0);
+  }
+  function pick(axis,v){
+    ans[idx]=[axis,v];
+    idx++;
+    if(idx>=Q.length){
+      $("opts").innerHTML="";$("back").classList.add("hidden");$("feed").innerHTML="";
+      $("fill").style.width="100%";
+      var t=addTyping("지인 1");
+      setTimeout(function(){
+        t.remove();addMsg("지인 1","잠깐만... 결과 나오는 중임");
+        setTimeout(finish,800);
+      },700);
+    }else{render()}
+  }
+  $("back").addEventListener("click",function(){
+    if(idx>0){idx--;ans.length=idx;render()}
+  });
+
+  function classify(){
+    var avg=(outer+inner)/(MAXO+MAXI);
+    var oN=outer/MAXO, iN=inner/MAXI;
+    var mid=(Math.abs(oN)<=0.15&&Math.abs(iN)<=0.15);
+    if(avg>=0.75)return "STRONGTOP";
+    if(avg<=-0.75)return "BORNBOT";
+    if(oN>=0.2&&iN<=-0.2)return "FAKETOP";
+    if(oN<=-0.2&&iN>=0.2)return "FAKEBOT";
+    if(clingy>=4||(clingy>=3&&Math.abs(avg)>=0.2)){
+      if(avg>0.05)return "MENTOP";
+      if(avg<-0.05)return "MENBOT";
+    }
+    if(flex>=5&&Math.abs(avg)<0.2){
+      if(avg>0.1)return "MIDTOP";
+      if(avg<-0.1)return "MIDBOT";
+      return "MID";
+    }
+    if(!mid){
+      if(avg>=0.2)return "TOP";
+      if(avg<=-0.2)return "BOT";
+    }
+    if(avg>0.1)return "MIDTOP";
+    if(avg<-0.1)return "MIDBOT";
+    return "MID";
+  }
+
+  function level(){
+    var r=Math.abs((outer+inner)/(MAXO+MAXI));
+    return r>=0.6?"아주 진한":r>=0.4?"뚜렷한":"은은한";
+  }
+
+  function gauge(label,v,max,color){
+    var pos=Math.max(0,Math.min(100,(v+max)/(2*max)*100));
+    var g=document.createElement("div");g.className="gauge";
+    g.style.setProperty("--tc",color);
+    g.innerHTML='<div class="name">'+label+'</div><div class="rail"><div class="dot" style="left:'+pos+'%"></div></div><div class="lab"><span>팸/바텀</span><span>탑/부치</span></div>';
+    return g;
+  }
+
+  function finish(){
+    recompute();
+    $("fill").style.width="100%";
+    var k=classify(),t=TYPES[k];
+    var lv=(k==="TOP"||k==="BOT")?level()+" ":"";
+    var card=$("card");
+    card.style.setProperty("--tc",t.color);
+    card.innerHTML='<canvas class="spr" id="sprite" width="200" height="140" aria-label="'+t.name+' 픽셀 캐릭터"></canvas>'
+      +'<div class="pos">'+t.pos+'</div>'
+      +'<h2>'+lv+t.name+'</h2>'
+      +'<p class="desc">'+t.desc+'</p>'
+      +'<div class="meta">'
+      +'<div><b>이럴 때 빛나요</b>'+t.good+'</div>'
+      +'<div><b>조심하면 좋은 점</b>'+t.care+'</div>'
+      +'<div><b>잘 맞는 유형</b>'+names(MATCH[k])+'</div>'
+      +'<div><b>피해야 할 유형</b>'+names(AVOID[k])+'</div>'
+      +'</div>';
+    drawSprite($("sprite").getContext("2d"),0,0,10,k,t.color);
+    var bars=$("bars");
+    bars.innerHTML='<h3>겉과 속의 위치</h3>';
+    bars.appendChild(gauge("온라인에서 보이는 나",outer,MAXO,t.color));
+    bars.appendChild(gauge("마음속의 나",inner,MAXI,t.color));
+    function lbl(v,m){var r=v/m;return r>=0.25?"탑/부치 쪽":r<=-0.25?"팸/바텀 쪽":"중간"}
+    $("copy").dataset.text="멤버놀이 성향 테스트 결과: "+lv+t.name+"\n겉: "+lbl(outer,MAXO)+" / 속: "+lbl(inner,MAXI);
+    last={t:t,k:k,match:names(MATCH[k]),avoid:names(AVOID[k]),title:lv+t.name,outer:outer,inner:inner};
+    $("shot").classList.add("hidden");
+    show("result");
+  }
+
+  var last=null;
+  var FF='"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif';
+  var HF='"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif';
+
+  var SPR={TOP:["short","shield"],BOT:["long","flower"],MID:["short","moon"],MIDTOP:["short","moon"],MIDBOT:["long","moon"],
+    STRONGTOP:["short","crown"],BORNBOT:["long","cloud"],MENTOP:["short","lock"],MENBOT:["long","heart"],
+    FAKETOP:["short","mask"],FAKEBOT:["long","swap"]};
+  var MATCH={
+    TOP:["BOT","BORNBOT","FAKETOP"],BOT:["TOP","STRONGTOP","MIDTOP"],MID:["MIDTOP","MIDBOT","TOP","BOT"],
+    MIDTOP:["BOT","MIDBOT","BORNBOT"],MIDBOT:["TOP","MIDTOP","STRONGTOP"],STRONGTOP:["BORNBOT","BOT","FAKETOP"],
+    BORNBOT:["STRONGTOP","TOP","MIDTOP"],MENTOP:["BOT","BORNBOT","MIDBOT"],MENBOT:["TOP","STRONGTOP","MENTOP"],
+    FAKETOP:["TOP","STRONGTOP","FAKEBOT"],FAKEBOT:["FAKETOP","BOT","BORNBOT"]
+  };
+  var AVOID={
+    TOP:["FAKEBOT","MENTOP"],BOT:["BOT","BORNBOT","MENBOT","FAKETOP"],MID:["STRONGTOP","BORNBOT"],
+    MIDTOP:["STRONGTOP","FAKEBOT"],MIDBOT:["BOT","BORNBOT","MENBOT"],STRONGTOP:["FAKEBOT","MENTOP"],
+    BORNBOT:["BOT","MENBOT","FAKETOP"],MENTOP:["FAKEBOT","MIDTOP"],MENBOT:["BOT","BORNBOT","MENBOT"],
+    FAKETOP:["BOT","MENBOT","FAKETOP"],FAKEBOT:["FAKEBOT","STRONGTOP"]
+  };
+  function names(list){return list.map(function(x){return TYPES[x].name}).join(" · ")}
+  var EXPR={TOP:["flat","base"],BOT:["happy","smile"],MID:["dot","base"],MIDTOP:["flat","smile"],MIDBOT:["dot","smile"],
+    STRONGTOP:["flat","smile"],BORNBOT:["happy","open"],MENTOP:["flat","frown"],MENBOT:["worried","frown"],
+    FAKETOP:["flat","open"],FAKEBOT:["dot","frown"]};
+  var EYE={dot:{},flat:{6:"eessee"},happy:{5:"sesses"},worried:{5:"esssse",6:"sesses"}};
+  var MOUTH={base:{},smile:{7:"pmssmp",8:"ssmmss"},frown:{7:"psmmsp",8:"smssms"},open:{7:"psmmsp",8:"ssmmss"}};
+  function side(m){return "..k"+m+"k.."}
+  function top(m){return "..."+m+"..."}
+  var EMPTY="..............";
+  var BASE=[EMPTY,EMPTY,EMPTY,top("kkkkkkkk"),side("ssssssss"),side("ssssssss"),side("sesssses"),side("spssssps"),side("sssmmsss"),top("kkkkkkkk"),side("aaaaaaaa"),side("aaaaaaaa"),side("aaaaaaaa"),"..kkkkkkkkkk.."];
+  var HAIR={
+    short:[[2,"....hhhhhh...."],[3,side("hhhhhhhh")],[4,side("hhsssshh")]],
+    long:[[2,"....hhhhhh...."],[3,side("hhhhhhhh")],[4,side("hhsssshh")],[5,side("hssssssh")],[6,side("hesssseh")],[7,side("hpssssph")],[8,side("hssmmssh")]]
+  };
+  var ICON={
+    shield:["xxxxx","xwwwx","xwwwx",".xwx.","..x.."],
+    flower:[".xxx.","xxwxx",".xxx.","..x..","..x.."],
+    moon:[".xxx.","xx...","x....","xx...",".xxx."],
+    crown:["x.x.x","xxxxx","xxwxx","xxxxx","....."],
+    cloud:[".xx..","xxxx.","xxxxx","xxxxx","....."],
+    lock:[".xxx.","x...x","xxxxx","xxwxx","xxxxx"],
+    heart:[".x.x.","xxxxx","xxxxx",".xxx.","..x.."],
+    mask:["xxxxx","xwxwx","xxxxx",".x.x.","....."],
+    swap:["..x..",".xxxx","..x..","xxxx.","..x.."]
+  };
+  function drawSprite(ctx,x,y,px,key,color){
+    var sp=SPR[key]||SPR.MID;
+    var pal={k:"#111214",s:"#ffd9bd",h:"#4a3566",e:"#111214",p:"#ff9bb0",m:"#c0556b",a:color,w:"#ffffff",x:color};
+    var rows=BASE.slice();
+    HAIR[sp[0]].forEach(function(h){
+      var r=rows[h[0]].split("");
+      for(var i=0;i<14;i++){if(h[1].charAt(i)!==".")r[i]=h[1].charAt(i)}
+      rows[h[0]]=r.join("");
+    });
+    var ex=EXPR[key]||["dot","base"];
+    [EYE[ex[0]],MOUTH[ex[1]]].forEach(function(o){
+      Object.keys(o).forEach(function(rn){
+        var row=rows[rn].split("");
+        for(var i=0;i<6;i++){row[4+i]=o[rn].charAt(i)}
+        rows[rn]=row.join("");
+      });
+    });
+    function put(grid,ox,oy){
+      grid.forEach(function(row,ry){
+        for(var cx=0;cx<row.length;cx++){
+          var c=row.charAt(cx);
+          if(c!=="."&&pal[c]){ctx.fillStyle=pal[c];ctx.fillRect(x+(ox+cx)*px,y+(oy+ry)*px,px,px)}
+        }
+      });
+    }
+    put(rows,0,0);
+    put(ICON[sp[1]],15,1);
+  }
+
+  function rr(ctx,x,y,w,h,r){
+    ctx.beginPath();ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
+  }
+  function wrapLines(ctx,text,maxW){
+    var lines=[],line="";
+    for(var i=0;i<text.length;i++){
+      var ch=text.charAt(i),test=line+ch;
+      if(ctx.measureText(test).width>maxW&&line){lines.push(line.trim());line=(ch===" ")?"":ch}
+      else{line=test}
+    }
+    if(line.trim())lines.push(line.trim());
+    return lines;
+  }
+  function paint(ctx,d,draw,W){
+    var X=120,CW=W-240,y=130;
+    function txt(str,x,yy,font,color,align){
+      ctx.font=font;
+      if(draw){ctx.fillStyle=color;ctx.textAlign=align||"left";ctx.textBaseline="top";ctx.fillText(str,x,yy)}
+    }
+    txt("멤버놀이 성향 테스트",W/2,y,"600 32px "+FF,"#b5bac1","center");y+=70;
+    if(draw)drawSprite(ctx,W/2-60,y,6,d.k,d.t.color);y+=108;
+    ctx.font="600 32px "+FF;
+    var pw=ctx.measureText(d.t.pos).width+60;
+    if(draw){rr(ctx,W/2-pw/2,y,pw,58,29);ctx.lineWidth=3;ctx.strokeStyle=d.t.color;ctx.stroke()}
+    txt(d.t.pos,W/2,y+12,"600 32px "+FF,"#f2f3f5","center");y+=58+36;
+    var fs=88;ctx.font="700 "+fs+"px "+HF;
+    while(ctx.measureText(d.title).width>CW&&fs>40){fs-=4;ctx.font="700 "+fs+"px "+HF}
+    txt(d.title,W/2,y,"700 "+fs+"px "+HF,"#f2f3f5","center");y+=fs+40;
+    ctx.font="38px "+FF;
+    wrapLines(ctx,d.t.desc,CW).forEach(function(l){txt(l,W/2,y,"38px "+FF,"#f2f3f5","center");y+=60});
+    y+=20;
+    [["이럴 때 빛남",d.t.good],["조심하면 좋은 점",d.t.care],["잘 맞는 유형",d.match],["피해야 할 유형",d.avoid]].forEach(function(m){
+      txt(m[0],W/2,y,"600 28px "+FF,"#b5bac1","center");y+=42;
+      ctx.font="34px "+FF;
+      wrapLines(ctx,m[1],CW).forEach(function(l){txt(l,W/2,y,"34px "+FF,"#f2f3f5","center");y+=50});
+      y+=24;
+    });
+    y+=10;
+    txt("겉과 속의 위치",W/2,y,"700 44px "+HF,"#f2f3f5","center");y+=70;
+    [["온라인에서 보이는 나",d.outer/MAXO],["마음속의 나",d.inner/MAXI]].forEach(function(g){
+      txt(g[0],W/2,y,"600 30px "+FF,"#f2f3f5","center");y+=46;
+      var pos=(Math.max(-1,Math.min(1,g[1]))+1)/2;
+      if(draw){
+        rr(ctx,X,y,CW,16,8);ctx.fillStyle="#404249";ctx.fill();
+        ctx.beginPath();ctx.arc(X+CW*pos,y+8,22,0,Math.PI*2);
+        ctx.fillStyle=d.t.color;ctx.fill();ctx.lineWidth=6;ctx.strokeStyle="#2b2d31";ctx.stroke();
+      }
+      y+=48;
+      txt("팸/바텀",X,y,"26px "+FF,"#b5bac1");
+      txt("탑/부치",X+CW,y,"26px "+FF,"#b5bac1","right");
+      y+=58;
+    });
+    return y;
+  }
+  function renderImage(){
+    var W=1080;
+    var sc=document.createElement("canvas");sc.width=W;sc.height=10;
+    var contentH=paint(sc.getContext("2d"),last,false,W);
+    var H=contentH+120;
+    var c=document.createElement("canvas");c.width=W;c.height=H;
+    var ctx=c.getContext("2d");
+    ctx.fillStyle="#1e1f22";ctx.fillRect(0,0,W,H);
+    rr(ctx,60,60,W-120,H-120,48);ctx.fillStyle="#2b2d31";ctx.fill();
+    ctx.lineWidth=3;ctx.strokeStyle="#1e1f22";ctx.stroke();
+    ctx.save();rr(ctx,60,60,W-120,H-120,48);ctx.clip();
+    ctx.fillStyle=last.t.color;ctx.fillRect(60,60,W-120,22);ctx.restore();
+    paint(ctx,last,true,W);
+    $("shotimg").src=c.toDataURL("image/png");
+    last.blob=null;
+    c.toBlob(function(b){last.blob=b},"image/png");
+    try{
+      if(window.claude&&window.claude.use){
+        window.claude.use("downloads").then(function(d){if(d)$("saveimg").classList.remove("hidden")},function(){});
+      }
+    }catch(e){}
+    $("shot").classList.remove("hidden");
+    $("shot").scrollIntoView({behavior:"smooth",block:"start"});
+  }
+  $("saveimg").addEventListener("click",function(){
+    if(!last||!last.blob||!window.claude||!window.claude.use)return;
+    window.claude.use("downloads").then(function(d){
+      if(d)return d.save({filename:"멤버놀이-성향-결과.png",data:last.blob});
+    }).catch(function(){});
+  });
+  $("mkimg").addEventListener("click",function(){
+    if(!last)return;
+    var btn=this;btn.textContent="이미지 만드는 중...";
+    var all=last.title+last.t.desc+last.t.good+last.t.care+last.match+last.avoid+last.t.pos+"멤버놀이 성향 테스트이럴 때 빛남조심하면 좋은 점잘 맞는 유형피해야 할 유형겉과 속의 위치온라인에서 보이는 나마음속의 나팸/바텀탑/부치";
+    var ready=Promise.resolve();
+    try{
+      if(document.fonts&&document.fonts.load){
+        ready=Promise.all([
+          document.fonts.load('700 88px "Noto Sans KR"',all),
+          document.fonts.load('400 38px "Noto Sans KR"',all),
+          document.fonts.load('700 32px "Noto Sans KR"',all)
+        ]).catch(function(){});
+      }
+    }catch(e){}
+    ready.then(function(){
+      try{renderImage()}catch(e){}
+      btn.textContent="결과 이미지 다시 만들기";
+    });
+  });
+
+  $("start").addEventListener("click",start);
+  $("again").addEventListener("click",start);
+  $("copy").addEventListener("click",function(){
+    var btn=this,txt=btn.dataset.text||"";
+    function done(){btn.textContent="복사됨";setTimeout(function(){btn.textContent="결과 텍스트 복사"},1500)}
+    function fallback(){
+      var ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();
+      try{document.execCommand("copy");done()}catch(e){}
+      document.body.removeChild(ta);
+    }
+    try{
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(done,fallback)}else{fallback()}
+    }catch(e){fallback()}
+  });
+})();
+</script>
+</body>
+</html>
